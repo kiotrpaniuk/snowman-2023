@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"golang.org/x/crypto/ssh/terminal"
 	"math/rand"
@@ -14,6 +15,7 @@ import (
 )
 
 func printCircle(radius int, padding int, isHead bool, topTrim int, bottomTrim int, hasHands bool) {
+
 	diameter := 2 * radius
 	for y := -radius + topTrim; y <= radius-bottomTrim; y++ {
 		fmt.Print("\n")
@@ -41,24 +43,26 @@ func printCircle(radius int, padding int, isHead bool, topTrim int, bottomTrim i
 					if (y == -radius/3 || y == radius/3) && (x == -1 || x == 1) { // buttons
 						fmt.Print("o")
 					} else {
-						if hasHands { // hands
-							if y == -radius+topTrim+6 && x == -24 || y == -radius+topTrim+7 && x == -23 {
-								fmt.Print("\\")
-							} else if y == -radius+topTrim+6 && x == 24 || y == -radius+topTrim+7 && x == 23 {
-								fmt.Print("/")
-							} else {
-								fmt.Print("*")
-							}
-						} else {
-							fmt.Print("*")
-						}
+						//if hasHands { // hands
+						//	if y == -radius+topTrim+6 && x == -diameter+5 || y == -radius+topTrim+7 && x == -diameter+6 {
+						//		fmt.Print("\\")
+						//	} else if y == -radius+topTrim+6 && x == 24 || y == -radius+topTrim+7 && x == 23 {
+						//		fmt.Print("/")
+						//	} else {
+						//		fmt.Print("*")
+						//	}
+						//} else {
+						fmt.Print("*")
+						//}
 					}
 				}
 			} else {
 				if hasHands { // hands
-					if (y == -radius+topTrim && x == -30) || (y == -radius+topTrim+1 && x == -29) || (y == -radius+topTrim+2 && x == -28) || (y == -radius+topTrim+3 && x == -27) || (y == -radius+topTrim+4 && x == -26) || (y == -radius+topTrim+5 && x == -25) {
+					//if (y == -radius+topTrim && x == -30) || (y == -radius+topTrim+1 && x == -29) || (y == -radius+topTrim+2 && x == -28) || (y == -radius+topTrim+3 && x == -27) || (y == -radius+topTrim+4 && x == -26) || (y == -radius+topTrim+5 && x == -25) {
+					if y == -radius+topTrim && x == -diameter || y == -radius+topTrim+1 && x == -diameter+1 || y == -radius+topTrim+2 && x == -diameter+2 || y == -radius+topTrim+3 && x == -diameter+3 || y == -radius+topTrim+4 && x == -diameter+4 {
 						fmt.Print("\\")
-					} else if (y == -radius+topTrim && x == 30) || (y == -radius+topTrim+1 && x == 29) || (y == -radius+topTrim+2 && x == 28) || (y == -radius+topTrim+3 && x == 27) || (y == -radius+topTrim+4 && x == 26) || (y == -radius+topTrim+5 && x == 25) {
+						//} else if (y == -radius+topTrim && x == 30) || (y == -radius+topTrim+1 && x == 29) || (y == -radius+topTrim+2 && x == 28) || (y == -radius+topTrim+3 && x == 27) || (y == -radius+topTrim+4 && x == 26) || (y == -radius+topTrim+5 && x == 25) {
+					} else if y == -radius+topTrim && x == diameter || y == -radius+topTrim+1 && x == diameter-1 || y == -radius+topTrim+2 && x == diameter-2 || y == -radius+topTrim+3 && x == diameter-3 || y == -radius+topTrim+4 && x == diameter-4 {
 						fmt.Print("/")
 					} else {
 						fmt.Print(" ")
@@ -119,17 +123,17 @@ func snowmanLoader(skipToQuestion bool) bool {
 			time.Sleep(500 * time.Millisecond)
 		}
 
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	loaderSuccessful := false
+	for {
 		time.Sleep(500 * time.Millisecond)
 
 		fmt.Println("\nSnowman ready!")
 		fmt.Println()
 
 		time.Sleep(1000 * time.Millisecond)
-	}
-
-	reader := bufio.NewReader(os.Stdin)
-	loaderSuccessful := false
-	for {
 		fmt.Print("Do you want to see the Snowman? (this action cannot be undone) (yes/no): ")
 		text, _ := reader.ReadString('\n')
 		// convert input to lower case
@@ -164,10 +168,10 @@ func showSnowman(windowWidth int, windowHeight int) {
 	if windowHeight > 80 {
 		scalingFactor = 1
 	} else {
-		scalingFactor = float32(windowHeight) / 110
+		scalingFactor = float32(windowHeight) / 100
 	}
 
-	fmt.Println("scalingFactor:", scalingFactor)
+	//fmt.Println("scalingFactor:", scalingFactor)
 
 	fmt.Println()
 	fmt.Println()
@@ -234,7 +238,7 @@ func showSnowman(windowWidth int, windowHeight int) {
 		//}
 	}
 
-	fmt.Println(snowmanDimensions)
+	//fmt.Println(snowmanDimensions)
 
 	// output the Snowman
 	printHat(snowmanDimensions["paddingHat"], snowmanDimensions["widthHat"])                                                                                               // hat
@@ -292,26 +296,37 @@ func getConsoleSizeWindows() (int, int, error) {
 }
 
 func main() {
+
+	fastPtr := flag.Bool("fast", false, "a bool")
+	flag.Parse()
 	fmt.Println()
-	fmt.Println(".***************************************.")
-	fmt.Println("|                                       |")
-	fmt.Println("|      ELLO Snowman Builder v2.0.1      |")
-	fmt.Println("|      Build date: 2023/12/12           |")
-	fmt.Println("|                                       |")
-	fmt.Println("'***************************************'")
+	fmt.Println(".***********************************************************************.")
+	fmt.Println("|                                                                       |")
+	fmt.Println("|    ELLO Snowman Builder v2.0.2                                        |")
+	fmt.Println("|    Build date: 2023/12/13                                             |")
+	fmt.Println("|                                                                       |")
+	fmt.Println("|    Release notes:                                                     |")
+	fmt.Println("|    * Every Snowman is unique, dimensions are randomised               |")
+	fmt.Println("|    * Quality of the Snowman depends on size of the terminal window    |")
+	fmt.Println("|    * Use --fast for fast mode (WARNING: Uses more snow)               |")
+	fmt.Println("|                                                                       |")
+	fmt.Println("'***********************************************************************'")
 	fmt.Println()
-	fmt.Println("Initialising, please wait..")
+	fmt.Println("Initialising, please wait")
+	if *fastPtr {
+		fmt.Println("Fast mode is enabled")
+	}
 	//time.Sleep(2000 * time.Millisecond)
 
 	windowWidth, windowHeight, err := getConsoleSize()
 	if err != nil {
 		fmt.Println("Error getting size:", err)
 	} else {
-		fmt.Printf("Width: %d, Height: %d\n", windowWidth, windowHeight)
+		fmt.Printf("Window dimensions: %dx%d\n", windowWidth, windowHeight)
 	}
 
 	//clearScreen()
-	if snowmanLoader(true) {
+	if snowmanLoader(*fastPtr) {
 		clearScreen()
 		showSnowman(windowWidth, windowHeight)
 		fmt.Println()
