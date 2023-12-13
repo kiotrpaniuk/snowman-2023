@@ -58,10 +58,8 @@ func printCircle(radius int, padding int, isHead bool, topTrim int, bottomTrim i
 				}
 			} else {
 				if hasHands { // hands
-					//if (y == -radius+topTrim && x == -30) || (y == -radius+topTrim+1 && x == -29) || (y == -radius+topTrim+2 && x == -28) || (y == -radius+topTrim+3 && x == -27) || (y == -radius+topTrim+4 && x == -26) || (y == -radius+topTrim+5 && x == -25) {
 					if y == -radius+topTrim && x == -diameter || y == -radius+topTrim+1 && x == -diameter+1 || y == -radius+topTrim+2 && x == -diameter+2 || y == -radius+topTrim+3 && x == -diameter+3 || y == -radius+topTrim+4 && x == -diameter+4 {
 						fmt.Print("\\")
-						//} else if (y == -radius+topTrim && x == 30) || (y == -radius+topTrim+1 && x == 29) || (y == -radius+topTrim+2 && x == 28) || (y == -radius+topTrim+3 && x == 27) || (y == -radius+topTrim+4 && x == 26) || (y == -radius+topTrim+5 && x == 25) {
 					} else if y == -radius+topTrim && x == diameter || y == -radius+topTrim+1 && x == diameter-1 || y == -radius+topTrim+2 && x == diameter-2 || y == -radius+topTrim+3 && x == diameter-3 || y == -radius+topTrim+4 && x == diameter-4 {
 						fmt.Print("/")
 					} else {
@@ -178,22 +176,7 @@ func showSnowman(windowWidth int, windowHeight int) {
 
 	// calculate Snowman dimensions based on window height
 	// when height is around 85-90 then the following dimensions work well
-	/*
-		widthHat := 43
-		paddingHat := 50
-		radiusHead := 10
-		radiusTorso := 15
-		radiusBase := 20
-		paddingHead := 50
-		paddingTorso := 40
-		paddingBase := 30
-		topTrimHead := 7
-		topTrimTorso := 1
-		topTrimBase := 3
-		bottomTrimHead := 2
-		bottomTrimTorso := 5
-		bottomTrimBase := 3
-	*/
+
 	var snowmanDimensions = map[string]int{
 		//"widthHat": 43,
 		//"paddingHat":  50,
@@ -211,8 +194,8 @@ func showSnowman(windowWidth int, windowHeight int) {
 		"bottomTrimBase":  3,
 	}
 
+	// Randomise the dimensions a bit
 	rand.Seed(time.Now().UnixNano())
-
 	for key, value := range snowmanDimensions {
 		if key == "radiusHead" || key == "radiusTorso" || key == "radiusBase" || key == "topTrimHead" || key == "bottomTrimHead" || key == "topTrimTorso" || key == "bottomTrimTorso" || key == "topTrimBase" || key == "bottomTrimBase" {
 			// Calculate the 10% margin
