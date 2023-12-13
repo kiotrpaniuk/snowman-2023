@@ -3,9 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/crypto/ssh/terminal"
+	"math/rand"
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -69,6 +72,11 @@ func printCircle(radius int, padding int, isHead bool, topTrim int, bottomTrim i
 }
 
 func printHat(padding int, width int) {
+	brimWidth := width + 10
+	hatCenterPosition := padding + (width / 2)
+	brimPadding := hatCenterPosition - (brimWidth / 2)
+	//fmt.Println(brimWidth, hatCenterPosition, brimPadding)
+
 	for i := 0; i < 7; i++ { // top of the hat
 		for j := 0; j < padding-1; j++ {
 			fmt.Print(" ")
@@ -80,10 +88,12 @@ func printHat(padding int, width int) {
 
 	}
 
-	for i := 0; i < padding-(padding/5); i++ {
+	for i := 0; i < brimPadding; i++ {
 		fmt.Print(" ")
 	}
-	fmt.Print("============================================================") // brim of the hat
+	for i := 0; i < brimWidth; i++ {
+		fmt.Print("=") // brim of the hat
+	}
 
 }
 
@@ -147,13 +157,90 @@ func snowmanLoader(skipToQuestion bool) bool {
 	}
 }
 
-func showSnowman() {
+func showSnowman(windowWidth int, windowHeight int) {
+
+	// calculate scaling factor
+	var scalingFactor float32
+	if windowHeight > 80 {
+		scalingFactor = 1
+	} else {
+		scalingFactor = float32(windowHeight) / 110
+	}
+
+	fmt.Println("scalingFactor:", scalingFactor)
+
 	fmt.Println()
 	fmt.Println()
-	printHat(50, 43)                        // hat
-	printCircle(10, 50, true, 7, 2, false)  // head with eyes, nose, and mouth
-	printCircle(15, 40, false, 1, 5, true)  // middle with buttons and hands
-	printCircle(20, 30, false, 3, 3, false) // bottom with buttons
+
+	// calculate Snowman dimensions based on window height
+	// when height is around 85-90 then the following dimensions work well
+	/*
+		widthHat := 43
+		paddingHat := 50
+		radiusHead := 10
+		radiusTorso := 15
+		radiusBase := 20
+		paddingHead := 50
+		paddingTorso := 40
+		paddingBase := 30
+		topTrimHead := 7
+		topTrimTorso := 1
+		topTrimBase := 3
+		bottomTrimHead := 2
+		bottomTrimTorso := 5
+		bottomTrimBase := 3
+	*/
+	var snowmanDimensions = map[string]int{
+		//"widthHat": 43,
+		//"paddingHat":  50,
+		"radiusHead":  10,
+		"radiusTorso": 15,
+		"radiusBase":  20,
+		//"paddingHead":     50,
+		//"paddingTorso":    40,
+		"paddingBase":     30,
+		"topTrimHead":     7,
+		"topTrimTorso":    3,
+		"topTrimBase":     3,
+		"bottomTrimHead":  3,
+		"bottomTrimTorso": 5,
+		"bottomTrimBase":  3,
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
+	for key, value := range snowmanDimensions {
+		if key == "radiusHead" || key == "radiusTorso" || key == "radiusBase" || key == "topTrimHead" || key == "bottomTrimHead" || key == "topTrimTorso" || key == "bottomTrimTorso" || key == "topTrimBase" || key == "bottomTrimBase" {
+			// Calculate the 10% margin
+			margin := int(float64(value) * 0.11)
+			// Generate a random number within the range [value - margin, value + margin]
+			randomValue := value - margin + rand.Intn(2*margin+1)
+			// Update the map
+			snowmanDimensions[key] = randomValue
+		}
+	}
+
+	snowmanDimensions["widthHat"] = snowmanDimensions["radiusHead"] * 4
+
+	centerPosition := snowmanDimensions["paddingBase"] + snowmanDimensions["radiusBase"]
+	snowmanDimensions["paddingHead"] = centerPosition - snowmanDimensions["radiusHead"] + 10
+	snowmanDimensions["paddingTorso"] = centerPosition - (snowmanDimensions["radiusTorso"]) + 5
+	snowmanDimensions["paddingHat"] = centerPosition - (snowmanDimensions["widthHat/2"]) + 1
+
+	// apply scaling to all snowmanDimensions
+	for key, value := range snowmanDimensions {
+		//if key == "radiusHead" || key == "radiusTorso" || key == "radiusBase" || key == "topTrimHead" || key == "bottomTrimHead" || key == "topTrimTorso" || key == "bottomTrimTorso" || key == "topTrimBase" || key == "bottomTrimBase" {
+		snowmanDimensions[key] = int(scalingFactor * float32(value))
+		//}
+	}
+
+	fmt.Println(snowmanDimensions)
+
+	// output the Snowman
+	printHat(snowmanDimensions["paddingHat"], snowmanDimensions["widthHat"])                                                                                               // hat
+	printCircle(snowmanDimensions["radiusHead"], snowmanDimensions["paddingHead"], true, snowmanDimensions["topTrimHead"], snowmanDimensions["bottomTrimHead"], false)     // head with eyes, nose, and mouth
+	printCircle(snowmanDimensions["radiusTorso"], snowmanDimensions["paddingTorso"], false, snowmanDimensions["topTrimTorso"], snowmanDimensions["bottomTrimTorso"], true) // middle with buttons and hands
+	printCircle(snowmanDimensions["radiusBase"], snowmanDimensions["paddingBase"], false, snowmanDimensions["topTrimBase"], snowmanDimensions["bottomTrimBase"], false)    // bottom with buttons
 	fmt.Println()
 }
 
@@ -169,6 +256,41 @@ func clearScreen() {
 	cmd.Run()
 }
 
+func getConsoleSize() (int, int, error) {
+	if runtime.GOOS == "windows" {
+		return getConsoleSizeWindows()
+	}
+	return getConsoleSizeUnix()
+}
+
+func getConsoleSizeUnix() (int, int, error) {
+	return terminal.GetSize(int(os.Stdin.Fd()))
+}
+
+func getConsoleSizeWindows() (int, int, error) {
+	cmd := exec.Command("powershell", "-Command", "$Host.UI.RawUI.WindowSize.Height")
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, 0, err
+	}
+	height, err := strconv.Atoi(strings.TrimSpace(string(output)))
+	if err != nil {
+		return 0, 0, err
+	}
+
+	cmd = exec.Command("powershell", "-Command", "$Host.UI.RawUI.WindowSize.Width")
+	output, err = cmd.Output()
+	if err != nil {
+		return 0, 0, err
+	}
+	width, err := strconv.Atoi(strings.TrimSpace(string(output)))
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return width, height, nil
+}
+
 func main() {
 	fmt.Println()
 	fmt.Println(".***************************************.")
@@ -179,12 +301,19 @@ func main() {
 	fmt.Println("'***************************************'")
 	fmt.Println()
 	fmt.Println("Initialising, please wait..")
-	time.Sleep(2000 * time.Millisecond)
+	//time.Sleep(2000 * time.Millisecond)
+
+	windowWidth, windowHeight, err := getConsoleSize()
+	if err != nil {
+		fmt.Println("Error getting size:", err)
+	} else {
+		fmt.Printf("Width: %d, Height: %d\n", windowWidth, windowHeight)
+	}
 
 	//clearScreen()
-	if snowmanLoader(false) {
+	if snowmanLoader(true) {
 		clearScreen()
-		showSnowman()
+		showSnowman(windowWidth, windowHeight)
 		fmt.Println()
 	} else {
 		fmt.Println("Good bye.")
