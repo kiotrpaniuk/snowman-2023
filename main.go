@@ -127,7 +127,7 @@ func snowmanLoader(skipToQuestion bool) bool {
 		text = strings.TrimSpace(text)
 
 		if text == "yes" {
-			fmt.Println("Ok, here it is..")
+			fmt.Println("Ok, here it is!")
 			time.Sleep(500 * time.Millisecond)
 			loaderSuccessful = true
 			break
@@ -154,6 +154,7 @@ func showSnowman() {
 	printCircle(10, 50, true, 7, 2, false)  // head with eyes, nose, and mouth
 	printCircle(15, 40, false, 1, 5, true)  // middle with buttons and hands
 	printCircle(20, 30, false, 3, 3, false) // bottom with buttons
+	fmt.Println()
 }
 
 func clearScreen() {
@@ -170,19 +171,21 @@ func clearScreen() {
 
 func main() {
 	fmt.Println()
-	fmt.Println(".*********************************.")
-	fmt.Println("|                                 |")
-	fmt.Println("|   ELLO Snowman Builder v2.0.1   |")
-	fmt.Println("|   Build date: 2023/12/12        |")
-	fmt.Println("|                                 |")
-	fmt.Println("'*********************************'")
+	fmt.Println(".***************************************.")
+	fmt.Println("|                                       |")
+	fmt.Println("|      ELLO Snowman Builder v2.0.1      |")
+	fmt.Println("|      Build date: 2023/12/12           |")
+	fmt.Println("|                                       |")
+	fmt.Println("'***************************************'")
 	fmt.Println()
 	fmt.Println("Initialising, please wait..")
 	time.Sleep(2000 * time.Millisecond)
+
 	//clearScreen()
 	if snowmanLoader(false) {
 		clearScreen()
 		showSnowman()
+		fmt.Println()
 	} else {
 		fmt.Println("Good bye.")
 	}
